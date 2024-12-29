@@ -22,9 +22,11 @@ router.post('/signin', async (req,res)=>{
 });
 
 router.post('/word', async (req,res)=>{
-    const {word, translation, definition, type, category, examples, image, token} = req.body;
+    const {word, translation, definition, type, category, examples, image, timestamp, token} = req.body;
     try {
         const check = jwt.verify(token, process.env.SAUCE);
+        let date;
+        if(timestamp) date = timestamp;
         if(!check.id) return res.status(403).json({message:"missing token"});
         if(!word || !translation ||!definition || !examples || !type ) return res.status(403).json({message:'important credential is missing'});
         const newWord = new Word({
@@ -35,6 +37,7 @@ router.post('/word', async (req,res)=>{
             examples,
             category,
             image,
+            date
         });
         await newWord.save();
         res.status(201).json(newWord);
